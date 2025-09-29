@@ -1,11 +1,10 @@
 ﻿<!DOCTYPE html>
+<html>
 <head>
   <title>Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-</head>
-
-<style>
+  <style>
 body  { font-family: Roboto,Lato,Arial; line-height:1.5; font-size:16px; margin:0; padding:0; overflow:hidden; }
 header { background: linear-gradient(to bottom right, #06c, #fc0); }
 header { color:#eee; padding:12px; font-size:20px; height:45px; font-family:"Open Sans" }
@@ -16,13 +15,11 @@ header { color:#eee; padding:12px; font-size:20px; height:45px; font-family:"Ope
 #menu button    { font-family:Lato,arial; border-radius:3px; border:none; padding:3px 6px}
 #right textarea { display:block; width:96%; margin:3px auto; background:#eee}
 .prompt { color:#322; background:#ccc; padding:6px; }
-
 @media print{
   #menu, #right { display:none!important }
   #left { position:relative; width:100%; left:0px; top:0px; border:none; height:auto; overflow:hidden }
   .prompt { border-bottom: 1px solid grey }
 }
-
 @media screen and (max-width: 880px) {
   #list, .desktop { display:none!important }
   #right { position:absolute; width:auto; height:auto; bottom:10px; left:8px; right:70px }
@@ -30,44 +27,44 @@ header { color:#eee; padding:12px; font-size:20px; height:45px; font-family:"Ope
   #btnSend { position:absolute; height:36px; bottom:12px; right:12px; }
   #left	 { width:97%; height:calc(100vh - 154px);  }
 }
-</style>
-
+  </style>
+</head>
+<body>
 <header>
-  <div id=heading style="float:left">Vanilla ChatGPT<br>
-    <span id=message style="color:yellow;font-size:10px">
-        <a href="https://github.com/casualwriter/vanilla-chatgpt" target=_NEW>github</a> @20230412
+  <div id="heading" style="float:left">Vanilla ChatGPT<br>
+    <span id="message" style="color:yellow;font-size:10px">
+        <a href="https://github.com/alberalm/vanilla-chatgpt" target="_blank">github</a> @20230412
     </span>
   </div>
-  <div id=menu style="float:right;">
+  <div id="menu" style="float:right;">
     <button onclick="chat.recognition()" title="voice input">🎤</button>
     <button onclick="chat.logout()" title="remove API key">Logout</button> 
     <button onclick="chat.export()" title="export conversation">Export</button>
-    <button class=desktop onclick="chat.showPrompts()" title="show prompts">Prompts</button>&nbsp;
-    <button id=btnSend accesskey=s onclick="chat.submit()" title="[Alt-S] submit prompt"><b>S</b>end</button>
+    <button class="desktop" onclick="chat.showPrompts()" title="show prompts">Prompts</button>&nbsp;
+    <button id="btnSend" accesskey="s" onclick="chat.submit()" title="[Alt-S] submit prompt"><b>S</b>end</button>
   </div>
 </header>
-
 <div id="content" style="margin:8px;color:#112;background:bed">
   <div id="right">
-     <textarea id=prompt rows=3 placeholder="please input prompt here.."></textarea>
+     <textarea id="prompt" rows="3" placeholder="please input prompt here.."></textarea>
      <div id="list" style="height:calc(100vh - 163px)">
         <b>Samples of prompt</b>
         <ul>
-          <li>A quote of today
-          <li>A table for 10 famous artists include name, DOB and style
-          <li>Create an article outline in markdown format for "teamwork"
-          <li>Create a dialogue discussing "the meaning of love"
-          <li>Introduce "vanilla chatGPT"
-          <li>Write a short story about "vanilla chatGPT"
-          <li>Discuss about the pros and cons of "vanilla js"
-          <li>Summarize the following content ...
+          <li>A quote of today</li>
+          <li>A table for 10 famous artists include name, DOB and style</li>
+          <li>Create an article outline in markdown format for "teamwork"</li>
+          <li>Create a dialogue discussing "the meaning of love"</li>
+          <li>Introduce "vanilla chatGPT"</li>
+          <li>Write a short story about "vanilla chatGPT"</li>
+          <li>Discuss about the pros and cons of "vanilla js"</li>
+          <li>Summarize the following content ...</li>
         </ul>
      </div>
   </div>
   <div id="left">
     <div id="main" style="padding:12px; max-width:960px">
        <h3>Welcome to vanilla-chatgpt.</h3>
-       <p class=desktop>Please submit prompt by pressing 
+       <p class="desktop">Please submit prompt by pressing 
        <label><input type="radio" name="submitkey" onclick="chat.hotkey='enter'" checked>[Enter]</label>
        <label><input type="radio" name="submitkey" onclick="chat.hotkey='ctrl'">[Ctrl-Enter]</label>
        </p>
@@ -75,138 +72,156 @@ header { color:#eee; padding:12px; font-size:20px; height:45px; font-family:"Ope
     </div>
   </div>
 </div>
-
 <link rel="stylesheet" href="casual-markdown@0.92.css">
 <script src="casual-markdown@0.92.js"></script>
 <script src="vanilla-chatgpt.js"></script>
-
 <script>
-/*****************************************************************************
-* vanilla-chatgpt.js - chat library for openai-chatgpt
-* 2023/03/28, v0.60, basic chat, responsive, print-friendly, export.
-* 2023/04/12, v0.70, refine UI for mobile, add voice speak and recognition
-*
-* Copyright (c) 2023, Casualwriter (MIT Licensed)
-* https://github.com/casualwriter/vanilla-chatgpt
-*****************************************************************************/
 // display result when receiving message
-chat.onmessage = function (text) {
-  chat("message").innerHTML = 'receiving messages..'
+chat.onmessage = function(text) {
+  chat("message").innerHTML = 'receiving messages..';
   chat("receiving").innerHTML = md.html(text + '<br><br>');
-}
+};
 
 // show whole conversation when message completed
-chat.oncomplete = (text) => {
-  let html1='', html2=''
-  chat("message").innerHTML = `(model: ${chat.model})`
-  chat.history.push( { prompt: chat.prompt, result: chat.result } )
+chat.oncomplete = function(text) {
+  var html1 = '', html2 = '';
+  chat("message").innerHTML = '(model: ' + chat.model + ')';
+  chat.history.push({ prompt: chat.prompt, result: chat.result });
   
-  for (let i=0; i<chat.history.length; i++) {
-     html1 += '<h4 class=prompt id=prompt'+i+' ondblclick="chat.clipboard('+i+')" title="doubleclick to copy">' 
-     html1 += chat.history[i].prompt + '</h4>\n' + chat.history[i].result + '\n\n'
-     html2 += '<li onclick="location=this.title" title="#prompt' + i + '">' + chat.history[i].prompt
+  for (var i = 0; i < chat.history.length; i++) {
+     html1 += '<h4 class="prompt" id="prompt' + i + '" ondblclick="chat.clipboard(' + i + ')" title="doubleclick to copy">'; 
+     html1 += chat.history[i].prompt + '</h4>\n' + chat.history[i].result + '\n\n';
+     html2 += '<li onclick="location=this.title" title="#prompt' + i + '">' + chat.history[i].prompt + '</li>';
   }
   
-  html1 += '<div><button style="float:left" onclick="chat.redo()">Redo</button>'
-  html1 += '<button style="float:right" onclick="chat.speak()">🔊 speak</button>'
+  html1 += '<div><button style="float:left" onclick="chat.redo()">Redo</button>';
+  html1 += '<button style="float:right" onclick="chat.speak()">🔊 speak</button>';
   
-  chat("main").innerHTML = md.html(html1) + '<br></div>'
-  chat("list").innerHTML = html2
+  chat("main").innerHTML = md.html(html1) + '<br></div>';
+  chat("list").innerHTML = html2;
   chat("left").scrollTop = chat("left").scrollHeight;
-  chat("btnSend").innerHTML = '<b>S</b>end'
+  chat("btnSend").innerHTML = '<b>S</b>end';
   
-  if (document.body.clientWidth > 800) {
-    chat('prompt').select()
-    chat('prompt').focus();
-  } else {
-    chat('prompt').value = ''
-  }  
-}
+  chat('prompt').value = '';
+};
 
-// abort fetch request.
-chat.abort = () => { 
-  chat.controller.abort()
-  chat("receiving").innerHTML += '\n<font color=red>Message Aborted!</font>'
+// abort fetch request (won't work on iPad 4 but won't break)
+chat.abort = function() { 
+  if (chat.controller && chat.controller.abort) {
+    chat.controller.abort();
+  }
+  chat("receiving").innerHTML += '\n<font color="red">Message Aborted!</font>';
   chat("receiving").id = 'abort';
 };
 
 // submit prompt
-chat.submit = () => {
+chat.submit = function() {
   if (chat("btnSend").innerText === 'Stop..') {
-    chat.abort()
-    chat("btnSend").innerText = 'Send'
+    chat.abort();
+    chat("btnSend").innerText = 'Send';
   } else {
-    chat.stream( chat.prompt = chat('prompt').value )
-    chat("main").innerHTML += '<h4 class=prompt>' + chat.prompt + '</h4>\n<div id=receiving>Receiving....</div>'
+    chat.prompt = chat('prompt').value;
+    chat.stream(chat.prompt);
+    chat("main").innerHTML += '<h4 class="prompt">' + chat.prompt + '</h4>\n<div id="receiving">Receiving....</div>';
     chat("left").scrollTop = chat("left").scrollHeight;
-    chat("btnSend").innerText = 'Stop..'
+    chat("btnSend").innerText = 'Stop..';
   }  
-}
-
-// show default prompt list
-chat.showPrompts = () => {
-  chat('list').innerHTML = chat.prompts
-  document.querySelectorAll('#list li').forEach( (element) => {
-    element.addEventListener('click', (event) => {
-      chat('prompt').value = element.innerText
-      chat('prompt').focus();
-    });
-  })
 };
 
-chat.clipboard = (i) => {
-  navigator.clipboard.writeText( '### '+ chat.history[i].prompt + '\n\n' + chat.history[i].result )
-  chat("message").innerText = 'dialogue has been copied to clipboard'
-}
+// show default prompt list
+chat.showPrompts = function() {
+  chat('list').innerHTML = chat.prompts;
+  var elements = document.querySelectorAll('#list li');
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].addEventListener('click', function() {
+      chat('prompt').value = this.innerText;
+      chat('prompt').focus();
+    });
+  }
+};
+
+chat.clipboard = function(i) {
+  // navigator.clipboard not available on iPad 4, use fallback
+  var text = '### ' + chat.history[i].prompt + '\n\n' + chat.history[i].result;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text);
+    chat("message").innerText = 'dialogue has been copied to clipboard';
+  } else {
+    // Fallback for older browsers
+    var textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.top = 0;
+    textArea.style.left = 0;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      chat("message").innerText = 'dialogue has been copied to clipboard';
+    } catch (err) {
+      chat("message").innerText = 'Could not copy text';
+    }
+    document.body.removeChild(textArea);
+  }
+};
 
 // prompt for API key if not found in localStorage
-window.onload = () => {
-  chat.apiKey = localStorage.getItem('OPENAI_API_KEY');
-  if (!chat.apiKey || chat.apiKey.length < 10 ) {
-     chat.apiKey = prompt("Please input Secret API key (will store in local.storage)", "sk-");
-     localStorage.setItem('OPENAI_API_KEY', chat.apiKey)
+window.onload = function() {
+  chat.apiKey = localStorage.getItem('API_KEY');
+  if (!chat.apiKey || chat.apiKey.length < 10) {
+     chat.apiKey = prompt("Please input Secret API key (will store in local.storage)", "");
+     localStorage.setItem('API_KEY', chat.apiKey);
   }
-  chat.prompts = chat('list').innerHTML
-  chat.showPrompts()
+  chat.prompts = chat('list').innerHTML;
+  chat.showPrompts();
   chat('prompt').focus();
-}
+};
 
 // add submit hot-key of ctrl-enter
 document.addEventListener('keydown', function(event) {
-  if ( event.key==='Enter' && (chat.hotkey!='ctrl'||event.ctrlKey)) {
+  if (event.key === 'Enter' && (chat.hotkey != 'ctrl' || event.ctrlKey)) {
     if (chat("btnSend").innerText === 'Send') { 
-      event.preventDefault(); chat.submit(); 
+      event.preventDefault(); 
+      chat.submit(); 
     }
   }  
 });
 
-// [20230412] redo. submit latest prompt
-chat.redo = () => {
-  chat.history.pop()
-  chat('prompt').value = chat.prompt
-  chat.submit()
-}
+// redo. submit latest prompt
+chat.redo = function() {
+  chat.history.pop();
+  chat('prompt').value = chat.prompt;
+  chat.submit();
+};
 
 // speak the latest answer
-chat.speak = (i)  => {
-  if (window.speechSynthesis.speaking) {
+chat.speak = function(i) {
+  if (window.speechSynthesis && window.speechSynthesis.speaking) {
      window.speechSynthesis.cancel();
-  } else {
-    i = ( i>=0? i : chat.history.length-1 )
-    const utterance = new SpeechSynthesisUtterance(chat.history[i].result);
+  } else if (window.speechSynthesis) {
+    i = (i >= 0 ? i : chat.history.length - 1);
+    var utterance = new SpeechSynthesisUtterance(chat.history[i].result);
     utterance.rate = 1.5;
     window.speechSynthesis.speak(utterance);
   }
-}
+};
 
 // voice recognition
-var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
-chat.speech = new SpeechRecognition();
-
-chat.speech.onresult = e => chat('prompt').value = e.results[0][0].transcript;
-
-chat.recognition = () => {
-  chat.speech.start()
-  chat('prompt').value = 'Listening...'
-}   
+if (typeof webkitSpeechRecognition !== 'undefined') {
+  chat.speech = new webkitSpeechRecognition();
+  chat.speech.onresult = function(e) {
+    chat('prompt').value = e.results[0][0].transcript;
+  };
+  chat.recognition = function() {
+    chat.speech.start();
+    chat('prompt').value = 'Listening...';
+  };
+} else {
+  chat.recognition = function() {
+    alert('Speech recognition not supported on this device');
+  };
+}
 </script>
+</body>
+</html>
